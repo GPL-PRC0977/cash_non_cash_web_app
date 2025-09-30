@@ -31,9 +31,9 @@ secret_project_id = os.getenv('EP_PROJECT_ID')
 secret_id = os.getenv('SECRET_ID')
 
 
-# domain = "https://cash-non-cash-api-740032229271.us-west1.run.app" # TODO: Change this to prod before deploying
+domain = "https://cash-non-cash-api-740032229271.us-west1.run.app" # TODO: Change this to prod before deploying
 
-domain = "http://127.0.0.1:5001"
+# domain = "http://127.0.0.1:5001"
 
 
 def get_api_key(project_id: str, secret_id: str) -> str:
