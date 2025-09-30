@@ -5,47 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
+        .container {
+            margin: auto;
+            margin-top: 70px;
+        }
         .custom_table td{
-            font-size: 13px;
+            font-size: 14px !important;
+        }
+        .table-container {
+            max-width: 100%;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
     {% include 'navbar.html' %}
 
-    <div class="card rounded-0" style="margin-top: 70px;">
-        <div class="card-body position-relative" style="height: calc(100vh - 53px);">
-        <table class="table table-sm table-bordered table-hover ms-1 me-1 custom_table">
-            <thead>
-                <tr>
-                    <th class="d-none">File ID</th>
-                    <th>File Name</th>
-                    <th>IR Type</th>
-                    <th>IR Details</th>
-                    <th>Document Type</th>
-                    <th>Error</th>
-                    <th>Date Uploaded</th>
-                    <th>Uploaded By</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if master_data %}
-                    {% for data in master_data%}
-                    <tr>
-                        <td class="d-none">{{ data.file_id }}</td>
-                        <td>{{ data.file_original_name }}</td>
-                        <td>{{ data.ir_type }}</td>
-                        <td>{{ data.ir_description }}</td>
-                        <td>{{ data.document_type }}</td>
-                        <td>{{ data.error }}</td>
-                        <td>{{ data.date_uploaded }}</td>
-                        <td>{{ data.uploaded_by }}</td>
-                    </tr>
-                    {% endfor %}
-                {% endif %}
-            </tbody>
-        </table>
+    <div class="container" style="max-width: unset !important;height:100%;">
+        <div class="card border-0" style="height: calc(100vh - 80px);">
+            <div class="table-container border-0">
+                <table class="table table-bordered table-hover custom_table" style="margin-bottom: unset !important;">
+                    <thead>
+                        <tr>
+                            <th class="d-none">File ID</th>
+                            <th>File Name</th>
+                            <th>IR Type</th>
+                            <th>IR Details</th>
+                            <th>Document Type</th>
+                            <th>Error</th>
+                            <th>Date Uploaded</th>
+                            <th>Uploaded By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if master_data %}
+                            {% for data in master_data%}
+                            <tr>
+                                <td class="d-none">{{ data.file_id }}</td>
+                                <td><i class="bi bi-paperclip text-primary" style="rotate: 5deg;"></i> <u>{{ data.file_original_name }}</u></td>
+                                <td>{{ data.ir_type }}</td>
+                                <td>{{ data.ir_description }}</td>
+                                <td>{{ data.document_type }}</td>
+                                <td>{{ data.error }}</td>
+                                <td>{{ data.date_uploaded }}</td>
+                                <td><i class="bi bi-person-fill"></i> {{ data.uploaded_by }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
     </div>
-</div>
 </body>
 </html>
