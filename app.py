@@ -31,9 +31,9 @@ secret_project_id = os.getenv('EP_PROJECT_ID')
 secret_id = os.getenv('SECRET_ID')
 
 
-domain = "https://cash-non-cash-api-740032229271.us-west1.run.app" # TODO: Change this to prod before deploying
+# domain = "https://cash-non-cash-api-latest-740032229271.europe-west1.run.app"
 
-# domain = "http://127.0.0.1:5001"
+domain = "http://127.0.0.1:5001" # TODO: Change this to prod before deploying
 
 
 def get_api_key(project_id: str, secret_id: str) -> str:
@@ -151,9 +151,9 @@ def dashboard():
         else:
             print("Valid primer email")
         # *----------------------------------------------------------------------
-        print(get_master_data())
+        print(get_master_data(email))
         picture = user_account['picture']
-        return render_template('dashboard.html', full_name=full_name, email=email, picture=picture, master_data=get_master_data())
+        return render_template('dashboard.html', full_name=full_name, email=email, picture=picture, master_data=get_master_data(email))
     else:
         return render_template('login.html')
 
@@ -299,9 +299,11 @@ def send_to_doc_ai(file):
 # Send to gemini api end <--------------------------------------------------------------------------------------------////////
 
 
-def get_master_data():
+def get_master_data(user):
     try:
         StartDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        print(f"User: {user}")
 
         url = f"{domain}/get_app_master_data"
 
@@ -310,7 +312,11 @@ def get_master_data():
             'Content-Type': 'application/json'
         }
 
-        response = requests.get(url, headers=headers)
+        payload = {
+            "user": user
+        }
+
+        response = requests.post(url, json=payload, headers=headers)
 
         if response.status_code != 200:
             print(
