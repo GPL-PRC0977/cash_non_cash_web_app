@@ -51,33 +51,49 @@ app = Flask(__name__)
 
 # Talisman(app, content_security_policy=csp)
 
-@app.errorhandler(404)
-@app.errorhandler(500)
-def error_handler(e):
-    response = make_response("Error", e.code if hasattr(e, 'code') else 500)
-    return add_security_headers(response)
 
+# @app.after_request
+# def add_security_headers(response):
+#     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+#     response.headers['X-Content-Type-Options'] = 'nosniff'
+#     response.headers['X-XSS-Protection'] = '1; mode=block'
+#     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
 
-@app.after_request
-def add_security_headers(response):
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+#     # ✅ Updated CSP to allow styles, scripts, fonts, images
+#     response.headers['Content-Security-Policy'] = (
+#         "default-src 'self'; "
+#         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+#         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+#         "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+#         "img-src 'self' data: https://cdn.jsdelivr.net; "
+#     )
 
-    # ✅ Updated CSP to allow styles, scripts, fonts, images
-    response.headers['Content-Security-Policy'] = (
-        "default-src 'self'; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
-        "img-src 'self' data: https://cdn.jsdelivr.net; "
-    )
+#     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+#     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'
+#     return response
 
-    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
-    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'
-    return response
+# @app.errorhandler(404)
+# @app.errorhandler(500)
+# def error_handler(e):
+#     response = make_response("Error", e.code if hasattr(e, 'code') else 500)
+#     return add_security_headers(response)
 
+Talisman(app,
+    content_security_policy={
+        'default-src': ["'self'"],
+        'style-src': ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
+        'script-src': ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        'font-src': ["'self'", 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net'],
+        'img-src': ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
+    },
+    frame_options='SAMEORIGIN',
+    referrer_policy='no-referrer-when-downgrade',
+    permissions_policy={
+        "geolocation": "()",
+        "microphone": "()"
+    },
+    force_https=True  # Required for HSTS
+)
 
 
 app.secret_key = 'your_secret_key'
