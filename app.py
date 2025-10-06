@@ -15,6 +15,7 @@ from authlib.integrations.flask_client import OAuth # type: ignore
 import google.auth
 import threading
 from datetime import datetime
+from flask_talisman import Talisman
 
 # * This is use to make the google authentication callback work
 # * Without this, the google authentication will not work after deploying in cloud run
@@ -23,6 +24,46 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 load_dotenv()
 
 app = Flask(__name__)
+
+
+
+csp = {
+    'default-src': ['\'self\''],
+    'style-src': [
+        '\'self\'',
+        'https://cdn.jsdelivr.net',    
+        'https://cdnjs.cloudflare.com', 
+        '\'unsafe-inline\'',           
+    ],
+    'script-src': [
+        '\'self\'',
+        'https://cdn.jsdelivr.net',
+        'https://cdnjs.cloudflare.com',
+        '\'unsafe-inline\'',           
+        '\'unsafe-eval\'',             
+    ],
+    'font-src': [
+        '\'self\'',
+        'https://fonts.gstatic.com',
+        'https://cdn.jsdelivr.net'
+    ]
+}
+
+Talisman(app, content_security_policy=csp)
+
+
+# @app.after_request
+# def add_security_headers(response):
+#     response.headers['X-Frame-Options'] = 'SAMEORIGIN'  # Prevent clickjacking
+#     response.headers['X-Content-Type-Options'] = 'nosniff'  # Prevent MIME sniffing
+#     response.headers['X-XSS-Protection'] = '1; mode=block'  # Enable XSS filtering (deprecated, but still useful)
+#     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'  # HSTS
+#     response.headers['Content-Security-Policy'] = "default-src 'self'"  # Control resources the user agent is allowed to load
+#     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'  # Referrer policy
+#     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'  # Control browser features
+
+#     return response
+
 app.secret_key = 'your_secret_key'
 
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -31,9 +72,9 @@ secret_project_id = os.getenv('EP_PROJECT_ID')
 secret_id = os.getenv('SECRET_ID')
 
 
-domain = "https://cash-non-cash-api-latest-740032229271.europe-west1.run.app"
+# domain = "https://cash-non-cash-api-latest-740032229271.europe-west1.run.app"
 
-# domain = "http://127.0.0.1:5001" # TODO: Change this to prod before deploying
+domain = "http://127.0.0.1:5001" # TODO: Change this to prod before deploying
 
 
 def get_api_key(project_id: str, secret_id: str) -> str:
@@ -80,6 +121,9 @@ google = oauth.register(
     redirect_uri=redirect_uri,
 )
 
+@app.route('/open_folder')
+def open_folder():
+    return redirect(f'https://drive.google.com/drive/folders/{session.get('user')}')
 
 @app.route('/login')
 def login():
