@@ -27,42 +27,52 @@ app = Flask(__name__)
 
 
 
-csp = {
-    'default-src': ['\'self\''],
-    'style-src': [
-        '\'self\'',
-        'https://cdn.jsdelivr.net',    
-        'https://cdnjs.cloudflare.com', 
-        '\'unsafe-inline\'',           
-    ],
-    'script-src': [
-        '\'self\'',
-        'https://cdn.jsdelivr.net',
-        'https://cdnjs.cloudflare.com',
-        '\'unsafe-inline\'',           
-        '\'unsafe-eval\'',             
-    ],
-    'font-src': [
-        '\'self\'',
-        'https://fonts.gstatic.com',
-        'https://cdn.jsdelivr.net'
-    ]
-}
+# csp = {
+#     'default-src': ['\'self\''],
+#     'style-src': [
+#         '\'self\'',
+#         'https://cdn.jsdelivr.net',    
+#         'https://cdnjs.cloudflare.com', 
+#         '\'unsafe-inline\'',           
+#     ],
+#     'script-src': [
+#         '\'self\'',
+#         'https://cdn.jsdelivr.net',
+#         'https://cdnjs.cloudflare.com',
+#         '\'unsafe-inline\'',           
+#         '\'unsafe-eval\'',             
+#     ],
+#     'font-src': [
+#         '\'self\'',
+#         'https://fonts.gstatic.com',
+#         'https://cdn.jsdelivr.net'
+#     ]
+# }
 
-Talisman(app, content_security_policy=csp)
+# Talisman(app, content_security_policy=csp)
 
 
-# @app.after_request
-# def add_security_headers(response):
-#     response.headers['X-Frame-Options'] = 'SAMEORIGIN'  # Prevent clickjacking
-#     response.headers['X-Content-Type-Options'] = 'nosniff'  # Prevent MIME sniffing
-#     response.headers['X-XSS-Protection'] = '1; mode=block'  # Enable XSS filtering (deprecated, but still useful)
-#     response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'  # HSTS
-#     response.headers['Content-Security-Policy'] = "default-src 'self'"  # Control resources the user agent is allowed to load
-#     response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'  # Referrer policy
-#     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'  # Control browser features
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
 
-#     return response
+    # ✅ Updated CSP to allow styles, scripts, fonts, images
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https://cdn.jsdelivr.net; "
+    )
+
+    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'
+    return response
+
+
 
 app.secret_key = 'your_secret_key'
 
