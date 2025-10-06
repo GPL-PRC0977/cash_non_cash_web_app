@@ -121,9 +121,9 @@ google = oauth.register(
     redirect_uri=redirect_uri,
 )
 
-@app.route('/open_folder')
-def open_folder():
-    return redirect(f'https://drive.google.com/drive/folders/{session.get('user')}')
+# @app.route('/open_folder')
+# def open_folder():
+#     return redirect(f'https://drive.google.com/drive/folders/{session.get('user')}')
 
 @app.route('/login')
 def login():
