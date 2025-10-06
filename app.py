@@ -4,7 +4,7 @@
 # * pip install Authlib
 # * pip install python-dotenv
 
-from flask import Flask, render_template, jsonify, request, url_for, session, redirect
+from flask import Flask, render_template, jsonify, request, url_for, session, redirect, make_response
 from werkzeug.utils import secure_filename
 import requests
 from dotenv import load_dotenv
@@ -50,6 +50,12 @@ app = Flask(__name__)
 # }
 
 # Talisman(app, content_security_policy=csp)
+
+@app.errorhandler(404)
+@app.errorhandler(500)
+def error_handler(e):
+    response = make_response("Error", e.code if hasattr(e, 'code') else 500)
+    return add_security_headers(response)
 
 
 @app.after_request
